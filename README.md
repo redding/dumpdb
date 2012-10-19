@@ -18,8 +18,6 @@ Or install it yourself as:
 
 ## Usage
 
-Dumpdb provides a framework for scripting database backups and restores.  You configure your source and target db settings.  You define the set of commands needed for your script to dump the remote (source) databases, fetch the dumps, and optionally restore the dump to your local (target) database.
-
 ```ruby
 require 'dumpdb'
 
@@ -27,78 +25,49 @@ class MysqlFullRestore
   include Dumpdb::Script
 
   databases { '/path/to/database.yml'}
+  source { db('production',  :output => '/some/source/dir') }
+  target { db('development', :output => '/some/target/dir') }
 
-  dump     { "mysqldump -u :user -p :pw :db | bzip2 > :fetch" }
-  fetch    { "data.bz2" }
-  restore  { "mysqladmin -u :user :pw -f -b DROP :db; true" }
-  restore  { "mysqladmin -u :user :pw -f CREATE :db" }
-  restore  { "bunzip2 -c :fetch | mysql -u :user :pw :db" }
+  dump    { "mysqldump -u :user -p :pw :db | bzip2 > :fetch" }
+  fetch   { "data.bz2" }
+  restore { "mysqladmin -u :user :pw -f -b DROP :db; true" }
+  restore { "mysqladmin -u :user :pw -f CREATE :db" }
+  restore { "bunzip2 -c :fetch | mysql -u :user :pw :db" }
 
 end
 ```
 
-### Run the script
+Dumpdb provides a framework for scripting database backups and restores.  You configure your source and target db settings.  You define the set of commands needed for your script to dump the remote (source) databases, fetch the dumps, and optionally restore the dump to your local (target) database.
 
-Once you have created an instance of your script with its database settings you can run it.  When running a script, you need to tell Dumpdb the source and the target databases
+### Running
+
+Once you have created an instance of your script with its database settings you can run it.
 
 ```ruby
-script.run do |runner|
-  # ...
-  runner.source('production', '/some/remote/dir')
-  runner.target('development', '/some/local/dir')
-end
+MysqlFullRestore.new.run
 ```
 
-Both `source` and `target` take two params: the db settings name, and the output path (on the remote server for source and local for target) available to the dump.  This path is where the fetch file will be written.
+Dumpdb runs the dump commands using source settings and runs the restore commands using target settings.  By default, Dumpdb assumes both the dump and restore commands are to be run on the local system.
 
-The Dumpdb Runner runs the dump commands on the remote source host and runs the restore commmands locally.  It assumes the restore commands are suitable to be run locally by you.  For the dump commands, Dumpdb will run them using SSH.  You need to tell Dumpdb how to ssh into the remote host as.
+### Remote dumps
 
-```ruby
-script.run do |runner|
-  runner.ssh_user('user')
-  # ...
-end
-```
-
-## Setup the databases
-
-A Dumpdb script needs to be told about its databases.  Specifically, it needs to know the host, user, pw, and db name for each.
-
-You tell it these when you define your script:
+To run your dump commands on a remote server, specify the optional `ssh` setting.
 
 ```ruby
 class MysqlFullRestore
   include Dumpdb::Script
 
-  databases do
-    { 'production' => {
-        'host' => 'host1.example.com', 'user' => 'host1', 'pw' => 'secret', 'db' => 'something_production'
-      },
-      'development' => {
-        'host' => 'localhost', 'user' => 'root', 'pw' => 'supersecret', 'db' => 'something_development'
-      }
-    }
-  end
+  ssh { 'user@host' }
 
   # ...
 end
 ```
 
-Alternatively, Dumpdb recognizes yaml configs:
-
-```ruby
-class MysqlFullRestore
-  include Dumpdb::Script
-
-  databases { '/path/to/database.yml'}
-
-  # ...
-end
-```
+This tells Dumpdb to run the dump commands using ssh on a remote host and to fetch the dumps using sftp.
 
 ## Define your script
 
-Every Dumpdb script assumes there are two types of commands involved: dump commands that run on the remote source and restore commands that run locally.  The dump commands should produce a single "fetch file" (typically a compressed dump file or archive file).  The restore commands restore the local db from the fetch file.
+Every Dumpdb script assumes there are two types of commands involved: dump commands that run using source settings and restore commands that run using target settings.  The dump commands should produce a single "fetch file" (typically a compressed dump file or archive file).  The restore commands restore the local db from the fetch file.
 
 ### The Fetch file
 
@@ -106,7 +75,7 @@ You specify the name of the fetch file using the `fetch` setting
 
 ```ruby
 # ...
-fetch   { "data.bz2" }
+fetch { "data.bz2" }
 #...
 ```
 
@@ -114,28 +83,17 @@ This tells Dumpdb what file on the remote server to expect and copy local.  The 
 
 ### Dump commands
 
-Dump commands are system commands that are run on the remote server.  They have one requirement: they should produce the fetch file.
+Dump commands are system commands that should produce the fetch file.
 
 ```ruby
 # ...
-dump    { "mysqldump -u :user -p :pw :db | bzip2 > :fetch" }
+dump { "mysqldump -u :user -p :pw :db | bzip2 > :fetch" }
 #...
 ```
 
-Dump commands are templated.  You define the command with placeholders and appropriate values are substituted in at runtime.
-
-Dump command placeholders:
-
-* `:host`  - source host setting
-* `:user`  - source user
-* `:pw`    - source pw
-* `:db`    - source db
-* `:out`   - the path where output can be written on the remote server
-* `:fetch` - the path to the fetch file on the remote server
-
 ### Restore commands
 
-Restore commands are system commands that are run locally to reset and restore the local db from the fetch file.
+Restore commands are system commands that should restore the local db from the fetch file.
 
 ```ruby
 # ...
@@ -145,26 +103,102 @@ restore { "bunzip2 -c :fetch | mysql -u :user :pw :db" }    # unzip the fetch fi
 #...
 ```
 
-Restore commands are templated.  You define the command with placeholders and appropriate values are substituted in at runtime.
+### Command Placeholders
 
-Dump command placeholders:
+Dump and restore commands are templated.  You define the command with placeholders and appropriate setting values are substituted in when the script is run.
 
-* `:host`  - target host setting
-* `:user`  - target user
-* `:pw`    - target pw
-* `:db`    - target db
-* `:out`   - the local path where output can be written
-* `:fetch` - the local path to the fetch file
+Command placeholders should correspond with keys in the source or target settings.  Dump commands use the source settings and restore commands use the target settings.
 
+### Special Placeholders
+
+There are two special placeholders that are added to the source and target settings automatically:
+
+* `:output` - the dir name the fetch file is written to - unique to each script instance.
+* `:fetch`  - the output path of the fetch file - uses the :output setting
+
+You should at least use the `:fetch` placeholder in your dump and restore commands to ensure proper dump fetching and usage.
+
+```ruby
+dump    { "mysqldump :db | bzip2 > :fetch" }
+fetch   { "data.bz2" }
+restore { "bunzip2 -c :fetch | mysql :db" }
+```
+
+## Source / Target settings
+
+A Dumpdb script needs to be told about its source and target settings.  You tell it these when you define your script:
+
+```ruby
+class MysqlFullRestore
+  include Dumpdb::Script
+
+  source do
+    { 'user' => 'something',
+      'pw'   => 'secret',
+      'db'   => 'something_production'
+    }
+  end
+
+  target do
+    { 'user' => 'root',
+      'pw'   => 'supersecret',
+      'db'   => 'something_development'
+    }
+  end
+
+  # ...
+end
+```
+
+Any settings keys can be used as command placeholders in dump and restore commands.
+
+### Lookup settings from YAML
+
+Since many ORMs allow you to configure db connections using yaml files, Dumpdb supports specifying your databases from a yaml file.
+
+```ruby
+class MysqlFullRestore
+  include Dumpdb::Script
+
+  databases { '/path/to/database.yml' }
+
+  # ...
+end
+```
+
+Now you can lookup your source and target settings using the `db` method.
+
+```ruby
+databases { '/path/to/database.yml' }
+source { db('production') }
+target { db('development') }
+```
+
+You can merge in additional settings by passing them to the `db` command:
+
+```ruby
+class MysqlFullRestore
+  include Dumpdb::Script
+
+  databases { '/path/to/database.yml' }
+  source { db('produciton', :something => 'else') }
+
+  # ...
+end
+```
+
+**Note:** When reading settings from yaml files, Dumpdb takes common keys like 'hostname', 'username', 'password', and 'database' and converts them to the more succinct 'host', 'user', 'pw', and 'db'.  This is not the case if you manually specify your settings.
 
 ### Building Commands
 
-As you may have noticed, the `dump`, `fetch`, and `restore` settings all take a proc as their argument.  This is because the procs are lazy-eval'd in the scope of the script instance.  This allows you to use interpolation to help build commands with dynamic data.  Take this example where you want your dump script to honor ignored tables.
+As you may have noticed, the script DSL methods all take a proc as their argument.  This is because the procs are lazy-eval'd in the scope of the script instance.  This allows you to use interpolation to help build commands with dynamic data.
+
+Take this example where you want your dump script to honor ignored tables.
 
 ```ruby
 require 'dumpdb'
 
-class MysqlLimitedRestore
+class MysqlIgnoredTablesRestore
   include Dumpdb::Script
 
   # ...
@@ -177,13 +211,9 @@ class MysqlLimitedRestore
   end
 
   def ignored_tables
-    opts[:ignored_tables].collect do |table|
-      "--ignore-table=#{source.db}.#{table}"
-    end.join(' ')
+    @opts[:ignored_tables].collect {|t| "--ignore-table=#{source.db}.#{t}"}.join(' ')
   end
-
 end
-
 ```
 
 ## Examples
