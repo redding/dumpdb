@@ -25,7 +25,7 @@ class MysqlFullRestore
   include Dumpdb::Script
 
   databases { '/path/to/database.yml'}
-  dump_file  { "dump.bz2" }
+  dump_file { "dump.bz2" }
   source { db('production',  :output => '/some/source/dir') }
   target { db('development', :output => '/some/target/dir') }
 
