@@ -4,8 +4,8 @@ require File.expand_path('../lib/dumpdb/version', __FILE__)
 Gem::Specification.new do |gem|
   gem.name        = "dumpdb"
   gem.version     = Dumpdb::VERSION
-  gem.description = %q{Dump, fetch, and restore your databases.}
-  gem.summary     = %q{Dump, fetch, and restore your databases.}
+  gem.description = %q{Dump and restore your databases.}
+  gem.summary     = %q{Dump and restore your databases.}
 
   gem.authors     = ["Kelly Redding"]
   gem.email       = ["kelly@kellyredding.com"]
