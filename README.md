@@ -49,6 +49,34 @@ MysqlFullRestore.new.run
 
 Dumpdb runs the dump commands using source settings and runs the restore commands using target settings.  By default, Dumpdb assumes both the dump and restore commands are to be run on the local system.
 
+### Runner Callbacks
+
+Dumpdb supports defining callbacks for your script.  These get fired as the script is being run.
+
+```ruby
+class MysqlFullRestore
+  include Dumpdb::Script
+
+  # ...
+
+  def after_dump
+    # this will be called after the dump commands have been run
+  end
+
+end
+```
+
+Available callbacks:
+
+* `{before|after}_run` - called before/after any commands have been executed
+* `{before|after}_setup` - called before/after the runner sets up the script run
+* `{before|after}_dump` - called before/after the dump cmds are executed
+* `{before|after}_copy_dump` - called before/after the dump file is copied from source to target
+* `{before|after}_restore` - called before/after the restore cmds are executed
+* `{before|after}_teardown` - called before/after the runner tears down the script run
+
+Phases occur in this order: setup, dump, copy_dump, restore, teardown
+
 ### Remote dumps
 
 To run your dump commands on a remote server, specify the optional `ssh` setting.
