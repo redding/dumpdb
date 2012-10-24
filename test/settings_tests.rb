@@ -121,10 +121,6 @@ module Dumpdb
   class DumpCmdTests < CmdTests
     desc "for dump commands"
 
-    should "be available" do
-      assert Settings::DumpCmd
-    end
-
     should "eval and apply any source placeholders to the cmd string" do
       cmd_val = Settings::DumpCmd.new(@cmd_str).value(@script)
       assert_equal "this is the local db: devdb", cmd_val
@@ -136,16 +132,11 @@ module Dumpdb
     desc "using ssh"
     setup do
       @script = RemoteScript.new
-      @exp_ssh_login = @script.ssh
-      @exp_ssh_flags = "-A"\
-                       " -o UserKnownHostsFile=/dev/null"\
-                       " -o StrictHostKeyChecking=no"\
-                       " -o ConnectTimeout=10"
       @cmd_str = Proc.new { "echo hello" }
     end
 
     should "build the cmds to run remtoely using ssh" do
-      exp_cmd_str = "ssh #{@exp_ssh_login} #{@exp_ssh_flags} echo hello"
+      exp_cmd_str = "ssh #{@script.ssh} -A #{@script.ssh_opts} echo hello"
       cmd_val = Settings::DumpCmd.new(@cmd_str).value(@script)
 
       assert_equal exp_cmd_str, cmd_val
@@ -156,13 +147,27 @@ module Dumpdb
   class RestoreCmdTests < CmdTests
     desc "for restore commands"
 
-    should "be available" do
-      assert Settings::RestoreCmd
-    end
-
     should "eval and apply any target placeholders to the cmd string" do
       cmd_val = Settings::RestoreCmd.new(@cmd_str).value(@script)
       assert_equal "this is the local db: testdb", cmd_val
+    end
+
+  end
+
+  class CopyDumpCmdTests < CmdTests
+
+    should "be a copy cmd for non-ssh scripts" do
+      script = @script
+      exp_cmd = "cp #{script.source.dump_file} #{script.target.dump_file}"
+
+      assert_equal exp_cmd, script.copy_dump_cmd
+    end
+
+    should "be an sftp cmd for ssh scripts" do
+      script = RemoteScript.new
+      exp_cmd = "sftp #{script.ssh}:#{script.source.dump_file} #{script.target.dump_file} #{script.ssh_opts}"
+
+      assert_equal exp_cmd, script.copy_dump_cmd
     end
 
   end

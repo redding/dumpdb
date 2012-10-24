@@ -11,13 +11,13 @@ module Dumpdb
     subject { @script }
 
     should have_cmeths :settings
-    should have_imeths :settings, :db, :run
+    should have_imeths :settings, :db, :ssh?, :ssh_opts, :run
 
     should have_cmeths :ssh, :databases, :dump_file, :source, :target
     should have_imeths :ssh, :databases, :dump_file, :source, :target
 
     should have_cmeths :dump, :restore
-    should have_imeths :dump_cmds, :restore_cmds
+    should have_imeths :dump_cmds, :restore_cmds, :copy_dump_cmd
 
     should "store its settings using ns-options" do
       assert_kind_of NsOptions::Namespace, subject.class.settings
@@ -57,6 +57,23 @@ module Dumpdb
       assert_raises BadDatabaseName do
         subject.db('does_not_exist')
       end
+    end
+
+  end
+
+  class SshTests < ScriptTests
+
+    should "know if its in ssh mode or not" do
+      assert     RemoteScript.new.ssh?
+      assert_not LocalScript.new.ssh?
+    end
+
+    should "know what ssh options to use" do
+      exp_opts = "-o UserKnownHostsFile=/dev/null"\
+                 " -o StrictHostKeyChecking=no"\
+                 " -o ConnectTimeout=10"\
+
+      assert_equal exp_opts, subject.ssh_opts
     end
 
   end

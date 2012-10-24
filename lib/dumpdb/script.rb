@@ -51,8 +51,9 @@ module Dumpdb
       def source;    @source    ||= settings.source.value(self);    end
       def target;    @target    ||= settings.target.value(self);    end
 
-      def dump_cmds;    @dump_cmds    ||= settings.dump_cmds.value(self);    end
-      def restore_cmds; @restore_cmds ||= settings.restore_cmds.value(self); end
+      def dump_cmds;     @dump_cmds     ||= settings.dump_cmds.value(self);        end
+      def restore_cmds;  @restore_cmds  ||= settings.restore_cmds.value(self);     end
+      def copy_dump_cmd; @copy_dump_cmd ||= Settings::CopyDumpCmd.new.value(self); end
 
     end
 
@@ -61,6 +62,14 @@ module Dumpdb
         raise BadDatabaseName, "no database named `#{database_name}'."
       end
       Db.new(self.dump_file, db_vals.merge(other_vals || {}))
+    end
+
+    def ssh?
+      self.ssh && !self.ssh.empty?
+    end
+
+    def ssh_opts
+      "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o ConnectTimeout=10"
     end
 
     def run; end

@@ -61,14 +61,9 @@ module Dumpdb::Settings
 
     def value(script, placeholder_vals={})
       val = super(script, script.source.to_hash.merge(placeholder_vals))
-      if script.ssh && !script.ssh.empty?
-        val = "ssh #{script.ssh} -A"\
-              " -o UserKnownHostsFile=/dev/null"\
-              " -o StrictHostKeyChecking=no"\
-              " -o ConnectTimeout=10"\
-              " #{val}"
+      if script.ssh?
+        val = "ssh #{script.ssh} -A #{script.ssh_opts} #{val}"
       end
-
       val
     end
 
@@ -78,6 +73,18 @@ module Dumpdb::Settings
 
     def value(script, placeholder_vals={})
       super(script, script.target.to_hash.merge(placeholder_vals))
+    end
+
+  end
+
+  class CopyDumpCmd < Cmd
+
+    def value(script)
+      if script.ssh?
+        "sftp #{script.ssh}:#{script.source.dump_file} #{script.target.dump_file} #{script.ssh_opts}"
+      else
+        "cp #{script.source.dump_file} #{script.target.dump_file}"
+      end
     end
 
   end
