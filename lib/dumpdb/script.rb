@@ -1,6 +1,8 @@
 require 'ns-options'
+
 require 'dumpdb/settings'
 require 'dumpdb/db'
+require 'dumpdb/runner'
 
 module Dumpdb
 
@@ -64,6 +66,9 @@ module Dumpdb
       Db.new(self.dump_file, db_vals.merge(other_vals || {}))
     end
 
+    def dump_cmd(&block);   Settings::DumpCmd.new(block).value(self);    end
+    def restore_cmd(&block) Settings::RestoreCmd.new(block).value(self); end
+
     def ssh?
       self.ssh && !self.ssh.empty?
     end
@@ -72,7 +77,24 @@ module Dumpdb
       "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -o ConnectTimeout=10"
     end
 
-    def run; end
+    def run(cmd_runner=nil)
+      Runner.new(self, :cmd_runner => cmd_runner).run
+    end
+
+    # Callbacks
+
+    def before_run;       end
+    def after_run;        end
+    def before_setup;     end
+    def after_setup;      end
+    def before_dump;      end
+    def after_dump;       end
+    def before_copy_dump; end
+    def after_copy_dump;  end
+    def before_restore;   end
+    def after_restore;    end
+    def before_teardown;  end
+    def after_teardown;   end
 
   end
 
