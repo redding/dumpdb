@@ -12,14 +12,16 @@ module Dumpdb
 
     def run
       run_callback 'before_run'
+      run_callback 'before_setup'
+      run_setup
 
-      [:setup, :dump, :copy_dump, :restore, :teardown].each do |phase|
-        run_callback "before_#{phase}"
-        self.send("run_#{phase}")
-        run_callback "after_#{phase}"
+      begin
+        run_callback 'after_setup'
+        [:dump, :copy_dump, :restore].each{|phase_name| run_phase phase_name}
+      ensure
+        run_phase 'teardown'
+        run_callback 'after_run'
       end
-
-      run_callback 'after_run'
     end
 
     protected
@@ -48,10 +50,16 @@ module Dumpdb
 
     private
 
-    def run_cmd(cmd)
-      cmd_obj = @cmd_runner.new(cmd)
+    def run_phase(phase_name)
+      run_callback "before_#{phase_name}"
+      self.send("run_#{phase_name}")
+      run_callback "after_#{phase_name}"
+    end
+
+    def run_cmd(cmd_str)
+      cmd_obj = @cmd_runner.new(cmd_str)
       run_callback('before_cmd_run', cmd_obj)
-      cmd_obj.run
+      cmd_obj.run!
       run_callback('after_cmd_run', cmd_obj)
     end
 
