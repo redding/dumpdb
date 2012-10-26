@@ -62,7 +62,7 @@ module Dumpdb::Settings
     def value(script, placeholder_vals={})
       val = super(script, script.source.to_hash.merge(placeholder_vals))
       if script.ssh?
-        val = "ssh #{script.ssh} -A #{script.ssh_opts} #{val}"
+        val = "ssh -A #{script.ssh_opts} #{script.ssh} \"#{val}\""
       end
       val
     end
@@ -81,7 +81,7 @@ module Dumpdb::Settings
 
     def value(script)
       if script.ssh?
-        "sftp #{script.ssh}:#{script.source.dump_file} #{script.target.dump_file} #{script.ssh_opts}"
+        "sftp #{script.ssh_opts} #{script.ssh}:#{script.source.dump_file} #{script.target.dump_file}"
       else
         "cp #{script.source.dump_file} #{script.target.dump_file}"
       end

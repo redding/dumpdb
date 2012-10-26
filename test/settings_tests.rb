@@ -136,7 +136,7 @@ module Dumpdb
     end
 
     should "build the cmds to run remtoely using ssh" do
-      exp_cmd_str = "ssh #{@script.ssh} -A #{@script.ssh_opts} echo hello"
+      exp_cmd_str = "ssh -A #{@script.ssh_opts} #{@script.ssh} \"echo hello\""
       cmd_val = Settings::DumpCmd.new(@cmd_str).value(@script)
 
       assert_equal exp_cmd_str, cmd_val
@@ -165,7 +165,7 @@ module Dumpdb
 
     should "be an sftp cmd for ssh scripts" do
       script = RemoteScript.new
-      exp_cmd = "sftp #{script.ssh}:#{script.source.dump_file} #{script.target.dump_file} #{script.ssh_opts}"
+      exp_cmd = "sftp #{script.ssh_opts} #{script.ssh}:#{script.source.dump_file} #{script.target.dump_file}"
 
       assert_equal exp_cmd, script.copy_dump_cmd
     end
