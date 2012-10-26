@@ -16,6 +16,10 @@ module Dumpdb
     end
 
     def run!
+      run
+    end
+
+    def run
       FakeCmdRunner.cmds << @cmd
     end
 

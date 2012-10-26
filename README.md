@@ -74,6 +74,7 @@ Available callbacks:
 * `{before|after}_copy_dump` - called before/after the dump file is copied from source to target
 * `{before|after}_restore` - called before/after the restore cmds are executed
 * `{before|after}_teardown` - called before/after the runner tears down the script run
+* `{before|after}_cmd_run` - called before/after each cmd is run, passes the cmd obj being run
 
 Phases occur in this order: setup, dump, copy_dump, restore, teardown
 

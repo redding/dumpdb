@@ -49,11 +49,14 @@ module Dumpdb
     private
 
     def run_cmd(cmd)
-      @cmd_runner.new(cmd).run!
+      cmd_obj = @cmd_runner.new(cmd)
+      run_callback('before_cmd_run', cmd_obj)
+      cmd_obj.run
+      run_callback('after_cmd_run', cmd_obj)
     end
 
-    def run_callback(meth)
-      @script.send(meth.to_s)
+    def run_callback(meth, *args)
+      @script.send(meth.to_s, *args)
     end
 
     def scmd_cmd_runner

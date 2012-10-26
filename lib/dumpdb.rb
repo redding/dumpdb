@@ -81,17 +81,19 @@ module Dumpdb
 
   # Callbacks
 
-  def before_run;       end
-  def after_run;        end
-  def before_setup;     end
-  def after_setup;      end
-  def before_dump;      end
-  def after_dump;       end
-  def before_copy_dump; end
-  def after_copy_dump;  end
-  def before_restore;   end
-  def after_restore;    end
-  def before_teardown;  end
-  def after_teardown;   end
+  def before_run(*args);       end
+  def after_run(*args);        end
+  def before_setup(*args);     end
+  def after_setup(*args);      end
+  def before_dump(*args);      end
+  def after_dump(*args);       end
+  def before_copy_dump(*args); end
+  def after_copy_dump(*args);  end
+  def before_restore(*args);   end
+  def after_restore(*args);    end
+  def before_teardown(*args);  end
+  def after_teardown(*args);   end
+  def before_cmd_run(*args);   end
+  def after_cmd_run(*args);    end
 
 end
