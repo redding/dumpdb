@@ -1,7 +1,7 @@
-require 'dumpdb/script'
+require 'dumpdb'
 
 class LocalScript
-  include Dumpdb::Script
+  include Dumpdb
 
   databases { 'test/support/database.yaml' }
   dump_file { "dump.#{type}" }
@@ -12,7 +12,7 @@ class LocalScript
 end
 
 class RemoteScript
-  include Dumpdb::Script
+  include Dumpdb
 
   ssh       { 'user@example.com' }
   databases { 'test/support/database.yaml' }
@@ -24,7 +24,7 @@ class RemoteScript
 end
 
 class RunnerScript
-  include Dumpdb::Script
+  include Dumpdb
 
   dump_file { 'dump.output' }
 

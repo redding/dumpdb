@@ -3,7 +3,7 @@ require 'assert'
 module Dumpdb
 
   class ScriptTests < Assert::Context
-    desc "the script mixin"
+    desc "the main script mixin"
     setup do
       # TODO: fix ns-options so you can set this to LocalScript and it won't fail
       @script = LocalScript.new

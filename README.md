@@ -22,7 +22,7 @@ Or install it yourself as:
 require 'dumpdb'
 
 class MysqlFullRestore
-  include Dumpdb::Script
+  include Dumpdb
 
   databases { '/path/to/database.yml'}
   dump_file { "dump.bz2" }
@@ -55,7 +55,7 @@ Dumpdb supports defining callbacks for your script.  These get fired as the scri
 
 ```ruby
 class MysqlFullRestore
-  include Dumpdb::Script
+  include Dumpdb
 
   # ...
 
@@ -83,7 +83,7 @@ To run your dump commands on a remote server, specify the optional `ssh` setting
 
 ```ruby
 class MysqlFullRestore
-  include Dumpdb::Script
+  include Dumpdb
 
   ssh { 'user@host' }
 
@@ -162,7 +162,7 @@ A Dumpdb script needs to be told about its source and target settings.  You tell
 
 ```ruby
 class MysqlFullRestore
-  include Dumpdb::Script
+  include Dumpdb
 
   source do
     { 'user' => 'something',
@@ -193,7 +193,7 @@ Since many ORMs allow you to configure db connections using yaml files, Dumpdb s
 
 ```ruby
 class MysqlFullRestore
-  include Dumpdb::Script
+  include Dumpdb
 
   databases { '/path/to/database.yml' }
 
@@ -213,7 +213,7 @@ You can merge in additional settings by passing them to the `db` command:
 
 ```ruby
 class MysqlFullRestore
-  include Dumpdb::Script
+  include Dumpdb
 
   databases { '/path/to/database.yml' }
   source { db('produciton', :something => 'else') }
@@ -232,7 +232,7 @@ Take this example where you want your dump script to honor ignored tables.
 require 'dumpdb'
 
 class MysqlIgnoredTablesRestore
-  include Dumpdb::Script
+  include Dumpdb
 
   # ...
   dump { "mysqldump -u :user -p :pw :db #{ignored_tables} | bzip2 > :dump_file" }
