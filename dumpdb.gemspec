@@ -7,8 +7,8 @@ Gem::Specification.new do |gem|
   gem.description = %q{Dump and restore your databases.}
   gem.summary     = %q{Dump and restore your databases.}
 
-  gem.authors     = ["Kelly Redding"]
-  gem.email       = ["kelly@kellyredding.com"]
+  gem.authors     = ["Kelly Redding", "Collin Redding"]
+  gem.email       = ["kelly@kellyredding.com", "collin.redding@me.com"]
   gem.homepage    = "http://github.com/redding/dumpdb"
 
   gem.files         = `git ls-files`.split("\n")
