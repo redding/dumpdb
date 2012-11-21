@@ -21,11 +21,12 @@ module Dumpdb
         option 'restore_cmds', Settings::CmdList,      :default => []
       end
 
-      # TODO: can move this to SettingsMethods if ns-option uses anonymous modules
-      def settings; self.class.settings; end
-
       extend  SettingsDslMethods
       include SettingsMethods
+
+      def self.inherited(subclass)
+        subclass.settings.apply(self.settings.to_hash)
+      end
 
     end
   end
@@ -44,6 +45,8 @@ module Dumpdb
   end
 
   module SettingsMethods
+
+    def settings; self.class.settings; end
 
     def ssh;       @ssh       ||= settings.ssh.value(self);       end
     def databases; @databases ||= settings.databases.value(self); end

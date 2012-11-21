@@ -5,7 +5,6 @@ module Dumpdb
   class ScriptTests < Assert::Context
     desc "the main script mixin"
     setup do
-      # TODO: fix ns-options so you can set this to LocalScript and it won't fail
       @script = LocalScript.new
     end
     subject { @script }
@@ -111,6 +110,19 @@ module Dumpdb
       assert_not_empty FakeCmdRunner.cmds
       assert_equal 7, FakeCmdRunner.cmds.size
       assert_equal "a restore cmd", FakeCmdRunner.cmds[-3]
+    end
+
+  end
+
+  class InheritedTests < ScriptTests
+    desc "when inherited"
+    setup do
+      @a_remote_script     = RemoteScript.new
+      @a_sub_remote_script = Class.new(RemoteScript).new
+    end
+
+    should "pass its definition values to any subclass" do
+      assert_equal @a_remote_script.ssh, @a_sub_remote_script.ssh
     end
 
   end
