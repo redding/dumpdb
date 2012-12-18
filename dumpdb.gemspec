@@ -18,5 +18,5 @@ Gem::Specification.new do |gem|
 
   gem.add_development_dependency("assert")
   gem.add_dependency("scmd",       ["~> 2.0"])
-  gem.add_dependency("ns-options", ["~> 1.1"])
+  gem.add_dependency("ns-options", ["~> 1.1", ">= 1.1.1"])
 end
