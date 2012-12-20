@@ -126,6 +126,20 @@ module Dumpdb
       assert_equal "this is the local db: devdb", cmd_val
     end
 
+    should "not escape any double-quotes in the cmds" do
+      orig_cmd    = "do_something --value=\"a_val\""
+      cmd_val = Settings::DumpCmd.new(Proc.new { orig_cmd }).value(@script)
+
+      assert_equal orig_cmd, cmd_val
+    end
+
+    should "not escape any backslashes in the cmds" do
+      orig_cmd    = "do \\something"
+      cmd_val = Settings::DumpCmd.new(Proc.new { orig_cmd }).value(@script)
+
+      assert_equal orig_cmd, cmd_val
+    end
+
   end
 
   class RemoteDumpCmdTests < DumpCmdTests
@@ -138,6 +152,33 @@ module Dumpdb
     should "build the cmds to run remtoely using ssh" do
       exp_cmd_str = "ssh -A #{@script.ssh_opts} #{@script.ssh} \"echo hello\""
       cmd_val = Settings::DumpCmd.new(@cmd_str).value(@script)
+
+      assert_equal exp_cmd_str, cmd_val
+    end
+
+    should "escape any double-quotes in the cmds" do
+      orig_cmd    = "do_something --value=\"a_val\""
+      exp_esc_cmd = "do_something --value=\\\"a_val\\\""
+      exp_cmd_str = "ssh -A #{@script.ssh_opts} #{@script.ssh} \"#{exp_esc_cmd}\""
+      cmd_val = Settings::DumpCmd.new(Proc.new { orig_cmd }).value(@script)
+
+      assert_equal exp_cmd_str, cmd_val
+    end
+
+    should "escape any backslashes in the cmds" do
+      orig_cmd    = "do \\something"
+      exp_esc_cmd = "do \\\\something"
+      exp_cmd_str = "ssh -A #{@script.ssh_opts} #{@script.ssh} \"#{exp_esc_cmd}\""
+      cmd_val = Settings::DumpCmd.new(Proc.new { orig_cmd }).value(@script)
+
+      assert_equal exp_cmd_str, cmd_val
+    end
+
+    should "escape any backslashes before double-quotes in the cmds" do
+      orig_cmd    = "do \\something --value=\"a_val\""
+      exp_esc_cmd = "do \\\\something --value=\\\"a_val\\\""
+      exp_cmd_str = "ssh -A #{@script.ssh_opts} #{@script.ssh} \"#{exp_esc_cmd}\""
+      cmd_val = Settings::DumpCmd.new(Proc.new { orig_cmd }).value(@script)
 
       assert_equal exp_cmd_str, cmd_val
     end
