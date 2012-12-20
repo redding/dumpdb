@@ -62,6 +62,7 @@ module Dumpdb::Settings
     def value(script, placeholder_vals={})
       val = super(script, script.source.to_hash.merge(placeholder_vals))
       if script.ssh?
+        val = val.gsub("\\", "\\\\\\").gsub('"', '\"')
         val = "ssh -A #{script.ssh_opts} #{script.ssh} \"#{val}\""
       end
       val
