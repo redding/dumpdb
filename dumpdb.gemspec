@@ -1,22 +1,24 @@
 # -*- encoding: utf-8 -*-
-require File.expand_path('../lib/dumpdb/version', __FILE__)
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require "dumpdb/version"
 
 Gem::Specification.new do |gem|
   gem.name        = "dumpdb"
   gem.version     = Dumpdb::VERSION
-  gem.description = %q{Dump and restore your databases.}
-  gem.summary     = %q{Dump and restore your databases.}
-
   gem.authors     = ["Kelly Redding", "Collin Redding"]
   gem.email       = ["kelly@kellyredding.com", "collin.redding@me.com"]
+  gem.description = %q{Dump and restore your databases.}
+  gem.summary     = %q{Dump and restore your databases.}
   gem.homepage    = "http://github.com/redding/dumpdb"
 
-  gem.files         = `git ls-files`.split("\n")
-  gem.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
-  gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
+  gem.files         = `git ls-files`.split($/)
+  gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
+  gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
 
-  gem.add_development_dependency("assert")
+  gem.add_dependency("assert",  ["~> 2.0"])
+
   gem.add_dependency("scmd",       ["~> 2.0"])
   gem.add_dependency("ns-options", ["~> 1.1", ">= 1.1.1"])
 end

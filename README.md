@@ -2,20 +2,6 @@
 
 Dump and restore your databases.
 
-## Installation
-
-Add this line to your application's Gemfile:
-
-    gem 'dumpdb'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install dumpdb
-
 ## Usage
 
 ```ruby
@@ -253,6 +239,20 @@ end
 ## Examples
 
 See `examples/` dir. (TODO)
+
+## Installation
+
+Add this line to your application's Gemfile:
+
+    gem 'dumpdb'
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install dumpdb
 
 ## Contributing
 
