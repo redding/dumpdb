@@ -1,5 +1,5 @@
 require 'assert'
-
+require 'test/support/test_scripts'
 require 'dumpdb/settings'
 
 module Dumpdb
@@ -57,7 +57,7 @@ module Dumpdb
     end
 
     should "come from a yaml file" do
-      databases = Settings::Databases.new('test/support/test.yaml')
+      databases = Settings::Databases.new(File.join(ROOT_PATH, 'test/support/test.yaml'))
       assert_equal({
         'db-one' => {'db' => 1},
         'db-two' => {'db' => 2},
