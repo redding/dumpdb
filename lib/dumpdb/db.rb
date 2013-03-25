@@ -1,5 +1,3 @@
-require 'ostruct'
-
 module Dumpdb
 
   class Db

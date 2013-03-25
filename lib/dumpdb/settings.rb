@@ -1,3 +1,4 @@
+require 'yaml'
 require 'dumpdb/db'
 
 module Dumpdb::Settings

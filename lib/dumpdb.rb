@@ -1,5 +1,5 @@
 require 'ns-options'
-
+require 'dumpdb/version'
 require 'dumpdb/settings'
 require 'dumpdb/db'
 require 'dumpdb/runner'

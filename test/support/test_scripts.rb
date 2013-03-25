@@ -3,7 +3,7 @@ require 'dumpdb'
 class LocalScript
   include Dumpdb
 
-  databases { 'test/support/database.yaml' }
+  databases { File.join(ROOT_PATH, 'test/support/database.yaml') }
   dump_file { "dump.#{type}" }
   source    { db('development', :another => 'value') }
   target    { db('test') }
@@ -15,7 +15,7 @@ class RemoteScript
   include Dumpdb
 
   ssh       { 'user@example.com' }
-  databases { 'test/support/database.yaml' }
+  databases { File.join(ROOT_PATH, 'test/support/database.yaml') }
   dump_file { "dump.#{type}" }
   source    { db('development') }
   target    { db('test') }

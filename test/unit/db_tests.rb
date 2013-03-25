@@ -1,12 +1,12 @@
 require 'assert'
-require 'ostruct'
+require 'dumpdb/db'
 
 module Dumpdb
 
   class DbTests < Assert::Context
     desc "the Db helper class"
     setup do
-      @db = Db.new(nil)#(:host => 'h', :user => 'u', :pw => 'p', :db => 'd')
+      @db = Db.new(nil)
     end
     subject { @db }
 

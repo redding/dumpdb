@@ -1,6 +1,6 @@
 require 'assert'
 require 'test/support/fake_cmd_runner'
-
+require 'test/support/test_scripts'
 require 'dumpdb/runner'
 
 module Dumpdb
