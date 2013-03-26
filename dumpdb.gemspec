@@ -17,7 +17,7 @@ Gem::Specification.new do |gem|
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.require_paths = ["lib"]
 
-  gem.add_dependency("assert",  ["~> 2.0"])
+  gem.add_development_dependency("assert",  ["~> 2.0"])
 
   gem.add_dependency("scmd",       ["~> 2.0"])
   gem.add_dependency("ns-options", ["~> 1.1", ">= 1.1.1"])
