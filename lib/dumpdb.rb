@@ -13,7 +13,6 @@ module Dumpdb
       include NsOptions
       options :settings do
         option 'ssh',          Settings::Ssh,          :default => ''
-        option 'databases',    Settings::Databases,    :default => {}
         option 'dump_file',    Settings::DumpFile,     :default => ''
         option 'source',       Settings::SourceTarget, :default => {}
         option 'target',       Settings::SourceTarget, :default => {}
@@ -34,7 +33,6 @@ module Dumpdb
   module SettingsDslMethods
 
     def ssh(&block);       settings.ssh       = Settings::Ssh.new(block);          end
-    def databases(&block); settings.databases = Settings::Databases.new(block);    end
     def dump_file(&block); settings.dump_file = Settings::DumpFile.new(block);     end
     def source(&block);    settings.source    = Settings::SourceTarget.new(block); end
     def target(&block);    settings.target    = Settings::SourceTarget.new(block); end
@@ -49,7 +47,6 @@ module Dumpdb
     def settings; self.class.settings; end
 
     def ssh;       @ssh       ||= settings.ssh.value(self);       end
-    def databases; @databases ||= settings.databases.value(self); end
     def dump_file; @dump_file ||= settings.dump_file.value(self); end
     def source;    @source    ||= settings.source.value(self);    end
     def target;    @target    ||= settings.target.value(self);    end
@@ -58,13 +55,6 @@ module Dumpdb
     def restore_cmds;  @restore_cmds  ||= settings.restore_cmds.value(self);     end
     def copy_dump_cmd; @copy_dump_cmd ||= Settings::CopyDumpCmd.new.value(self); end
 
-  end
-
-  def db(database_name, other_vals=nil)
-    if (db_vals = self.databases[database_name]).nil?
-      raise BadDatabaseName, "no database named `#{database_name}'."
-    end
-    Db.new(self.dump_file, db_vals.merge(other_vals || {}))
   end
 
   def dump_cmd(&block);   Settings::DumpCmd.new(block).value(self);    end

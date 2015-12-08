@@ -12,10 +12,11 @@ module Dumpdb
     subject { @script }
 
     should have_cmeths :settings
-    should have_imeths :settings, :db, :dump_cmd, :restore_cmd, :ssh?, :ssh_opts, :run
+    should have_imeths :settings, :dump_cmd, :restore_cmd
+    should have_imeths :ssh?, :ssh_opts, :run
 
-    should have_cmeths :ssh, :databases, :dump_file, :source, :target
-    should have_imeths :ssh, :databases, :dump_file, :source, :target
+    should have_cmeths :ssh, :dump_file, :source, :target
+    should have_imeths :ssh, :dump_file, :source, :target
 
     should have_cmeths :dump, :restore
     should have_imeths :dump_cmds, :restore_cmds, :copy_dump_cmd
@@ -32,37 +33,11 @@ module Dumpdb
 
     should "store off the settings for the script" do
       assert_kind_of Settings::Ssh,          subject.settings.ssh
-      assert_kind_of Settings::Databases,    subject.settings.databases
       assert_kind_of Settings::DumpFile,     subject.settings.dump_file
       assert_kind_of Settings::SourceTarget, subject.settings.source
       assert_kind_of Settings::SourceTarget, subject.settings.target
       assert_kind_of Settings::CmdList,      subject.settings.dump_cmds
       assert_kind_of Settings::CmdList,      subject.settings.restore_cmds
-    end
-
-  end
-
-  class DbMethTests < ScriptTests
-    desc "`db' method"
-    setup do
-      @script = LocalScript.new
-    end
-
-    should "build a Db based on the named database values" do
-      assert_kind_of Db, subject.target
-      assert_equal 'testhost', subject.target.host
-    end
-
-    should "build a Db based on the named database values plus additional values" do
-      assert_kind_of Db, subject.source
-      assert_equal 'devhost', subject.source.host
-      assert_equal 'value', subject.source.another
-    end
-
-    should "complain if looking up a db not in the `databases` collection" do
-      assert_raises BadDatabaseName do
-        subject.db('does_not_exist')
-      end
     end
 
   end

@@ -3,10 +3,22 @@ require 'dumpdb'
 class LocalScript
   include Dumpdb
 
-  databases { File.join(ROOT_PATH, 'test/support/database.yaml') }
   dump_file { "dump.#{type}" }
-  source    { db('development', :another => 'value') }
-  target    { db('test') }
+  source do
+    { :host     => 'devhost',
+      :user     => 'devuser',
+      :pw       => 'devpw',
+      :db       => 'devdb',
+      :another  => 'value'
+    }
+  end
+  target do
+    { :host => 'testhost',
+      :user => 'testuser',
+      :pw   => 'testpw',
+      :db   => 'testdb'
+    }
+  end
 
   def type; "local"; end
 end
@@ -15,10 +27,21 @@ class RemoteScript
   include Dumpdb
 
   ssh       { 'user@example.com' }
-  databases { File.join(ROOT_PATH, 'test/support/database.yaml') }
   dump_file { "dump.#{type}" }
-  source    { db('development') }
-  target    { db('test') }
+  source do
+    { :host     => 'devhost',
+      :user     => 'devuser',
+      :pw       => 'devpw',
+      :db       => 'devdb',
+    }
+  end
+  target do
+    { :host => 'testhost',
+      :user => 'testuser',
+      :pw   => 'testpw',
+      :db   => 'testdb'
+    }
+  end
 
   def type; "remote"; end
 end

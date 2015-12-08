@@ -10,10 +10,23 @@ require 'dumpdb'
 class MysqlFullRestore
   include Dumpdb
 
-  databases { '/path/to/database.yml'}
   dump_file { "dump.bz2" }
-  source { db('production',  :output_root => '/some/source/dir') }
-  target { db('development', :output_root => '/some/target/dir') }
+  source do
+    { :host        => 'production.example.com',
+      :port        => 1234,
+      :user        => 'admin',
+      :pw          => 'secret',
+      :db          => 'myapp_db',
+      :output_root => '/some/source/dir'
+    }
+  end
+  target do
+    { :host        => 'localhost',
+      :user        => 'admin',
+      :db          => 'myapp_db',
+      :output_root => '/some/target/dir'
+    }
+  end
 
   dump    { "mysqldump -u :user -p\":pw\" :db | bzip2 > :dump_file" }
   restore { "mysqladmin -u :user -p\":pw\" -f -b DROP :db; true" }
@@ -152,17 +165,17 @@ class MysqlFullRestore
   include Dumpdb
 
   source do
-    { 'user' => 'something',
-      'pw'   => 'secret',
-      'db'   => 'something_production',
-      'something' => 'else'
+    { :user      => 'something',
+      :pw        => 'secret',
+      :db        => 'something_production',
+      :something => 'else'
     }
   end
 
   target do
-    { 'user' => 'root',
-      'pw'   => 'supersecret',
-      'db'   => 'something_development'
+    { :user => 'root',
+      :pw   => 'supersecret',
+      :db   => 'something_development'
     }
   end
 
@@ -171,43 +184,6 @@ end
 ```
 
 Any settings keys can be used as command placeholders in dump and restore commands.
-
-**Note:** When reading source and target settings, Dumpdb takes common keys like 'hostname', 'username', 'password', and 'database' and exposes them with the more succinct 'host', 'user', 'pw', and 'db'.
-
-### Lookup settings from YAML
-
-Since many ORMs allow you to configure db connections using yaml files, Dumpdb supports specifying your databases from a yaml file.
-
-```ruby
-class MysqlFullRestore
-  include Dumpdb
-
-  databases { '/path/to/database.yml' }
-
-  # ...
-end
-```
-
-Now you can lookup your source and target settings using the `db` method.
-
-```ruby
-databases { '/path/to/database.yml' }
-source { db('production') }
-target { db('development') }
-```
-
-You can merge in additional settings by passing them to the `db` command:
-
-```ruby
-class MysqlFullRestore
-  include Dumpdb
-
-  databases { '/path/to/database.yml' }
-  source { db('produciton', :something => 'else') }
-
-  # ...
-end
-```
 
 ### Building Commands
 
@@ -231,7 +207,7 @@ class MysqlIgnoredTablesRestore
   end
 
   def ignored_tables
-    @opts[:ignored_tables].collect {|t| "--ignore-table=#{source.db}.#{t}"}.join(' ')
+    @opts[:ignored_tables].map{ |t| "--ignore-table=#{source.db}.#{t}" }.join(' ')
   end
 end
 ```
