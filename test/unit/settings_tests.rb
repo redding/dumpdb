@@ -38,34 +38,6 @@ module Dumpdb
 
   end
 
-  class DatabasesSettingTests < SettingsTests
-    desc "`databases` setting"
-    setup do
-      @from_hash = {
-        'db1' => {'db' => 'one'},
-        'db2' => {'db' => 'two'},
-      }
-    end
-
-    should "be available" do
-      assert Settings::Databases
-    end
-
-    should "come from a hash" do
-      databases = Settings::Databases.new(@from_hash)
-      assert_equal @from_hash, databases.value(@script)
-    end
-
-    should "come from a yaml file" do
-      databases = Settings::Databases.new(File.join(ROOT_PATH, 'test/support/test.yaml'))
-      assert_equal({
-        'db-one' => {'db' => 1},
-        'db-two' => {'db' => 2},
-      }, databases.value(@script))
-    end
-
-  end
-
   class DumpFileSettingTests < SettingsTests
     desc "`dump_file` setting"
 
@@ -90,13 +62,6 @@ module Dumpdb
 
       assert_kind_of Db, db
       assert_equal 'from_hash', db.host
-    end
-
-    should "come from a Db obj" do
-      db = Settings::Databases.new(Db.new('dump.file', {'host' => 'from_db'})).value(@script)
-
-      assert_kind_of Db, db
-      assert_equal 'from_db', db.host
     end
 
   end

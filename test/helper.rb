@@ -8,3 +8,5 @@ $LOAD_PATH.unshift(ROOT_PATH)
 # require pry for debugging (`binding.pry`)
 require 'pry'
 
+require 'test/support/factory'
+

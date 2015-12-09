@@ -1,4 +1,3 @@
-require 'yaml'
 require 'dumpdb/db'
 
 module Dumpdb::Settings
@@ -19,27 +18,13 @@ module Dumpdb::Settings
 
   class Ssh < Base; end
 
-  class Databases < Base
-
-    def value(script)
-      val = super
-      val.kind_of?(::String) ? load_yaml(val) : val
-    end
-
-    private
-
-    def load_yaml(file_path)
-      YAML.load(File.read(File.expand_path(file_path)))
-    end
-  end
-
   class DumpFile < Base; end
 
   class SourceTarget < Base
 
     def value(script)
-      val = super
-      val.kind_of?(Dumpdb::Db) ? val : Dumpdb::Db.new(script.dump_file, val)
+      hash = super
+      Dumpdb::Db.new(script.dump_file, hash)
     end
 
   end
@@ -53,7 +38,7 @@ module Dumpdb::Settings
     private
 
     def hsub(string, hash)
-      hash.inject(string) {|new_str, (k, v)| new_str.gsub(":#{k}", v.to_s)}
+      hash.inject(string){ |new_str, (k, v)| new_str.gsub(":#{k}", v.to_s) }
     end
 
   end
@@ -94,7 +79,7 @@ module Dumpdb::Settings
   class CmdList < ::Array
 
     def value(script, placeholder_vals={})
-      self.map{|cmd| cmd.value(script, placeholder_vals)}
+      self.map{ |cmd| cmd.value(script, placeholder_vals) }
     end
 
   end
