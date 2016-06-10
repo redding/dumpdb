@@ -41,7 +41,7 @@ class Dumpdb::Db
         :custom_value => @custom_value
       })
     end
-    subject { @db }
+    subject{ @db }
 
     should have_imeths :host, :port, :user, :pw, :db
     should have_imeths :output_root, :output_dir, :dump_file
@@ -54,8 +54,10 @@ class Dumpdb::Db
       assert_equal @pw,          subject.pw
       assert_equal @db_name,     subject.db
       assert_equal @output_root, subject.output_root
+
       exp = File.join(@output_root, "#{@host}__#{@db_name}__#{@current_time.to_f}")
       assert_equal exp, subject.output_dir
+
       exp = File.join(subject.output_dir, @dump_file_name)
       assert_equal exp, subject.dump_file
     end
@@ -75,6 +77,7 @@ class Dumpdb::Db
       assert_equal DEFAULT_VALUE, db.db
       assert_equal DEFAULT_VALUE, db.output_root
       assert_equal @current_time.to_f.to_s, db.output_dir
+
       exp = File.join(db.output_dir, 'dump.output')
       assert_equal exp, db.dump_file
     end

@@ -1,15 +1,22 @@
 require 'assert'
+require 'dumpdb'
+
 require 'test/support/fake_cmd_runner'
 require 'test/support/test_scripts'
 
 module Dumpdb
 
-  class ScriptTests < Assert::Context
-    desc "the main script mixin"
+  class UnitTests < Assert::Context
+    desc "Dumpdb"
+
+  end
+
+  class InitTests < UnitTests
+    desc "when init"
     setup do
-      @script = LocalScript.new
+      @script = LocalScript.new # mixes in Dumpdb
     end
-    subject { @script }
+    subject{ @script }
 
     should have_cmeths :settings
     should have_imeths :settings, :dump_cmd, :restore_cmd
@@ -42,7 +49,7 @@ module Dumpdb
 
   end
 
-  class CmdMethsTests < ScriptTests
+  class CmdMethsTests < InitTests
 
     should "build dump command strings" do
       assert_equal 'echo local', subject.dump_cmd { "echo #{type}" }
@@ -54,7 +61,7 @@ module Dumpdb
 
   end
 
-  class SshTests < ScriptTests
+  class SshTests < InitTests
 
     should "know if its in ssh mode or not" do
       assert     RemoteScript.new.ssh?
@@ -71,27 +78,27 @@ module Dumpdb
 
   end
 
-  class RunTests < ScriptTests
+  class RunTests < InitTests
     setup do
-      FakeCmdRunner.reset
+      Dumpdb::FakeCmdRunner.reset
       @script = RunnerScript.new
     end
     teardown do
-      FakeCmdRunner.reset
+      Dumpdb::FakeCmdRunner.reset
     end
 
     should "run the script when `run` is called" do
-      assert_empty FakeCmdRunner.cmds
-      @script.run(FakeCmdRunner)
+      assert_empty Dumpdb::FakeCmdRunner.cmds
+      @script.run(Dumpdb::FakeCmdRunner)
 
-      assert_not_empty FakeCmdRunner.cmds
-      assert_equal 7, FakeCmdRunner.cmds.size
-      assert_equal "a restore cmd", FakeCmdRunner.cmds[-3]
+      assert_not_empty Dumpdb::FakeCmdRunner.cmds
+      assert_equal 7, Dumpdb::FakeCmdRunner.cmds.size
+      assert_equal "a restore cmd", Dumpdb::FakeCmdRunner.cmds[-3]
     end
 
   end
 
-  class InheritedTests < ScriptTests
+  class InheritedTests < InitTests
     desc "when inherited"
     setup do
       @a_remote_script     = RemoteScript.new

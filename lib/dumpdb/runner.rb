@@ -1,12 +1,13 @@
 require 'dumpdb/settings'
 
 module Dumpdb
+
   class Runner
 
     attr_reader :script, :cmd_runner
 
     def initialize(script, opts={})
-      @script = script
+      @script     = script
       @cmd_runner = opts[:cmd_runner] || scmd_cmd_runner
     end
 
@@ -17,22 +18,22 @@ module Dumpdb
 
       begin
         run_callback 'after_setup'
-        [:dump, :copy_dump, :restore].each{|phase_name| run_phase phase_name}
+        [:dump, :copy_dump, :restore].each{ |phase_name| run_phase phase_name }
       ensure
         run_phase 'teardown'
         run_callback 'after_run'
       end
     end
 
-    protected
+    private
 
     def run_setup
-      run_cmd(@script.dump_cmd    { "mkdir -p #{source.output_dir}"  })
-      run_cmd(@script.restore_cmd { "mkdir -p #{target.output_dir}"  })
+      run_cmd(@script.dump_cmd{ "mkdir -p #{source.output_dir}" })
+      run_cmd(@script.restore_cmd{ "mkdir -p #{target.output_dir}" })
     end
 
     def run_dump
-      @script.dump_cmds.each{|cmd| run_cmd(cmd)}
+      @script.dump_cmds.each{ |cmd| run_cmd(cmd) }
     end
 
     def run_copy_dump
@@ -40,15 +41,13 @@ module Dumpdb
     end
 
     def run_restore
-      @script.restore_cmds.each{|cmd| run_cmd(cmd)}
+      @script.restore_cmds.each{ |cmd| run_cmd(cmd) }
     end
 
     def run_teardown
-      run_cmd(@script.dump_cmd    { "rm -rf #{source.output_dir}" })
-      run_cmd(@script.restore_cmd { "rm -rf #{target.output_dir}" })
+      run_cmd(@script.dump_cmd{ "rm -rf #{source.output_dir}" })
+      run_cmd(@script.restore_cmd{ "rm -rf #{target.output_dir}" })
     end
-
-    private
 
     def run_phase(phase_name)
       run_callback "before_#{phase_name}"
@@ -73,4 +72,5 @@ module Dumpdb
     end
 
   end
+
 end

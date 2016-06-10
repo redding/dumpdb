@@ -1,39 +1,41 @@
 require 'assert'
-require 'test/support/fake_cmd_runner'
-require 'test/support/test_scripts'
 require 'dumpdb/runner'
 
-module Dumpdb
+require 'test/support/fake_cmd_runner'
+require 'test/support/test_scripts'
 
-  class RunnerTests < Assert::Context
-    desc "the runner"
+class Dumpdb::Runner
+
+  class UnitTests < Assert::Context
+    desc "Dumpdb::Runner"
     setup do
-      FakeCmdRunner.reset
+      @fake_cmd_runner = Dumpdb::FakeCmdRunner
+      @fake_cmd_runner.reset
+
       @script = RunnerScript.new
-      @runner = Runner.new(@script, :cmd_runner => FakeCmdRunner)
+      @runner = Dumpdb::Runner.new(@script, :cmd_runner => @fake_cmd_runner)
     end
     teardown do
-      FakeCmdRunner.reset
+      @fake_cmd_runner.reset
     end
-    subject { @runner }
-
+    subject{ @runner }
 
     should have_reader :script, :cmd_runner
 
     should "run the script" do
-      assert_empty FakeCmdRunner.cmds
+      assert_empty @fake_cmd_runner.cmds
       subject.run
 
-      assert_not_empty FakeCmdRunner.cmds
-      assert_equal 7, FakeCmdRunner.cmds.size
-      assert_equal "a restore cmd", FakeCmdRunner.cmds[-3]
+      assert_not_empty @fake_cmd_runner.cmds
+      assert_equal 7, @fake_cmd_runner.cmds.size
+      assert_equal "a restore cmd", @fake_cmd_runner.cmds[-3]
     end
 
     should "call the callbacks" do
-      assert_not @script.all_callbacks_called?
+      assert_false @script.all_callbacks_called?
       subject.run
 
-      assert @script.all_callbacks_called?
+      assert_true @script.all_callbacks_called?
     end
 
   end

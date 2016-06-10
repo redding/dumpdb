@@ -6,7 +6,7 @@ module Dumpdb::Settings
 
     attr_reader :proc
 
-    def initialize(proc=nil)
+    def initialize(proc = nil)
       @proc = proc.kind_of?(::Proc) ? proc : Proc.new { proc }
     end
 
@@ -45,7 +45,7 @@ module Dumpdb::Settings
 
   class DumpCmd < Cmd
 
-    def value(script, placeholder_vals={})
+    def value(script, placeholder_vals = {})
       val = super(script, script.source.to_hash.merge(placeholder_vals))
       if script.ssh?
         val = val.gsub("\\", "\\\\\\").gsub('"', '\"')
@@ -58,7 +58,7 @@ module Dumpdb::Settings
 
   class RestoreCmd < Cmd
 
-    def value(script, placeholder_vals={})
+    def value(script, placeholder_vals = {})
       super(script, script.target.to_hash.merge(placeholder_vals))
     end
 
@@ -78,7 +78,7 @@ module Dumpdb::Settings
 
   class CmdList < ::Array
 
-    def value(script, placeholder_vals={})
+    def value(script, placeholder_vals = {})
       self.map{ |cmd| cmd.value(script, placeholder_vals) }
     end
 
