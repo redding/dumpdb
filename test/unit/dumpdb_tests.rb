@@ -33,18 +33,13 @@ module Dumpdb
     should have_imeths :before_dump, :before_copy_dump, :before_restore
     should have_imeths :after_dump,  :after_copy_dump,  :after_restore
 
-    should "store its settings using ns-options" do
-      assert_kind_of NsOptions::Namespace, subject.class.settings
-      assert_same subject.class.settings, subject.settings
-    end
-
     should "store off the settings for the script" do
-      assert_kind_of Settings::Ssh,          subject.settings.ssh
-      assert_kind_of Settings::DumpFile,     subject.settings.dump_file
-      assert_kind_of Settings::SourceTarget, subject.settings.source
-      assert_kind_of Settings::SourceTarget, subject.settings.target
-      assert_kind_of Settings::CmdList,      subject.settings.dump_cmds
-      assert_kind_of Settings::CmdList,      subject.settings.restore_cmds
+      assert_kind_of Settings::Ssh,          subject.settings[:ssh]
+      assert_kind_of Settings::DumpFile,     subject.settings[:dump_file]
+      assert_kind_of Settings::SourceTarget, subject.settings[:source]
+      assert_kind_of Settings::SourceTarget, subject.settings[:target]
+      assert_kind_of Settings::CmdList,      subject.settings[:dump_cmds]
+      assert_kind_of Settings::CmdList,      subject.settings[:restore_cmds]
     end
 
   end
